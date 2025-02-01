@@ -7,6 +7,7 @@
 
 typedef struct {
     char nome[50];
+    //TODO: trocar tipo de int para ENUM
     int tipo; //se tipo 1, item de ataque, se tipo 3, item de defesa
     int valor;
 } Item;
