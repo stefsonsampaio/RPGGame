@@ -1,3 +1,5 @@
+//cd "c:\vs.code\RPGGame" && gcc GameManager.C -o GameManager && "C:\vs.code\RPGGame\"GameManager comando para executar script no CMD
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -56,9 +58,9 @@ void adicionaEquipamento(Player *p, char nome[], int tipo, int valor) {
 void exibePropriedadesDoPlayer(Player *p) {
     printf("\nSuas propriedades:\n");
     printf("- vida: %d\n", p->vida);
-    printf("- quantidade de poçoes de cura: %d\n", p->quantidade_cura);
+    printf("- quantidade de pocoes de cura: %d\n", p->quantidade_cura);
     if (strlen(p->item.nome) > 0) {
-        printf("- Equipamento: %c\n", p->item);
+        printf("- Equipamento: %c\n", p->item.nome);
         if (p->item.tipo == 1) {
             printf("- Dano do equipamento: %d\n", p->item.valor);
         }
@@ -74,36 +76,89 @@ void luta(Player *p, Inimigo *i) {
 
     printf("\nInicio de batalha!\n");
     Sleep(1200);
+    
+    printf("Voce deu de cara com um goblin level 2, de %d pontos de vida!\n", i->vida);
+
+    int rodadasComEscudoAtivo;
 
     while(p->vida > 0 && i->vida > 0) {
-        int danoPlayer = rand() % (p->ataque + 1);
-        if (danoPlayer == 0) {
-            printf("Voce tentou atacar o inimigo mas ele desviou! Nenhum dano causado.\n");
+        Sleep(1200);
+        printf("\n1. Atacar o inimigo?\n");
+        printf("2. Estabelecer defesa (Duracaoo de 3 rodadas)?\n");
+        printf("3. Utilizar item de cura?\n");
+
+        int escolha;
+        printf("\nComo voce vai prosseguir? (1, 2, 3)\n ");
+        scanf("%d", &escolha);
+
+        while (escolha < 1 || escolha > 3) {
+            printf("Opcao invalida! Digite um numero de 1 a 3.\n ");
+            scanf("%d", &escolha);
         }
-        else {
-            i->vida -= danoPlayer;
-            if (i->vida < 0) i->vida = 0;
-            printf("Voce atacou causando %d de dano! Vida do inimigo: %d\n", danoPlayer, i->vida);
-            if (i->vida <= 0) {
-                printf("O inimigo foi derrotado!\n");
-                break;
+
+        if (escolha == 1) {
+            int danoPlayer = rand() % (p->ataque + 1);
+            if (danoPlayer == 0) {
+                Sleep(1200);
+                printf("\nVoce tentou atacar o inimigo mas ele desviou! Nenhum dano causado.\n");
+            }
+            else {
+                i->vida -= danoPlayer;
+                if (i->vida < 0) i->vida = 0;
+                Sleep(1200);
+                printf("\nVoce atacou causando %d de dano! Vida do inimigo: %d\n", danoPlayer, i->vida);
+                if (i->vida <= 0) {
+                    Sleep(1200);
+                    printf("\nO inimigo foi derrotado!\n");
+                    break;
+                }
             }
         }
-        Sleep(1200);
+        else if (escolha == 2) {
+            Sleep(1200);
+            printf("Defesa reforcada por 3 rodadas!\n");
+            rodadasComEscudoAtivo = 3;
+        }
+        else if (escolha == 3) {
+            if (p->quantidade_cura > 0) {
+                p->vida += 20;
+                p->quantidade_cura -= 1;
+
+                Sleep(1200);
+                printf("Voce usou uma pocao de cura. Sua vida agora e %d. Quantidade de itens de cura restante: %d\n", p->vida, p->quantidade_cura);
+            }
+            else {
+                Sleep(1200);
+                printf("Voce nao tem mais curas! Sua rodada foi desperdicada.");
+            }
+        }
 
         int danoInimigo = rand() % (i->ataque + 1);
+
+        if (rodadasComEscudoAtivo > 0) {
+            //TODO
+            //lógica para diminuir o dano do inimigo de acordo com a defesa do player
+            //a defesa do player aumenta se ele estiver equipado com um item do tipo escudo
+        }
+
         if (danoInimigo == 0) {
+            Sleep(1200);
             printf("O inimigo tentou te atacar mas voce desviou! Nenhum dano sofrido.\n");
         }
         else {
             p->vida -= danoInimigo;
             if (p->vida < 0) p->vida = 0;
+            Sleep(1200);
             printf("O inimigo te atacou causando %d de dano! Sau vida: %d\n", danoInimigo, p->vida);
             if (p->vida <= 0) {
+                Sleep(1200);
                 printf("O jogador foi derrotado!\n");
             }
         }
-        Sleep(1200);
+
+        if (rodadasComEscudoAtivo > 0) {
+            rodadasComEscudoAtivo -= 1;
+        }
     }
 }
 
@@ -112,16 +167,20 @@ int main()
     Player meuPlayer = inicializaPlayer(100, 20, 10, 3);
 
     for (int i = 0; i < 5; i++) {
+        char nextLevel;
+
         if (meuPlayer.vida <= 0) {
+            Sleep(1200);
             printf("O jogador morreu! Fim de jogo.\n");
             return 0;
         }
 
+        Sleep(1200);
         exibePropriedadesDoPlayer(&meuPlayer);
 
-        char nextLevel;
         printf("\nPronto para a proxima etapa? (S/N)\n");
-        scanf("%c\n", &nextLevel);
+        fflush(stdin);
+        scanf(" %c", &nextLevel);
 
         if (toupper(nextLevel) == 'N') {
             printf("\nJogo encerrado!");
@@ -133,6 +192,7 @@ int main()
     }
 
     if (meuPlayer.vida > 0) {
+        Sleep(1200);
         printf("\nParabens! Voce venceu o jogo!\n");
     }
 
