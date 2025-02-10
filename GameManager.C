@@ -5,12 +5,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <ctype.h>
+#include <math.h>
 #include <windows.h>
+
+typedef enum {
+    Nenhum = -1,
+    Defesa,
+    Ataque,
+    Magia
+} TipoItem;
 
 typedef struct {
     char nome[50];
-    //TODO: trocar tipo de int para ENUM
-    int tipo; //se tipo 1, item de ataque, se tipo 3, item de defesa
+    TipoItem tipo;
     int valor;
 } Item;
 
@@ -25,6 +32,7 @@ typedef struct {
 typedef struct {
     int vida;
     int ataque;
+    int level;
 } Inimigo;
 
 Player inicializaPlayer(int vida, int ataque, int defesa, int quantidade_cura) {
@@ -35,24 +43,25 @@ Player inicializaPlayer(int vida, int ataque, int defesa, int quantidade_cura) {
     p.quantidade_cura = quantidade_cura;
 
     strcpy(p.item.nome, "");
-    p.item.tipo = 0;
+    p.item.tipo = Nenhum;
     p.item.valor = 0;
 
     return p;
 }
 
-Inimigo inicializaInimigo(int vida, int ataque) {
-    Inimigo i;
-    i.vida = vida;
-    i.ataque = ataque;
-
-    return i;
-}
-
-void adicionaEquipamento(Player *p, char nome[], int tipo, int valor) {
+void equiparItem(Player *p, const char *nome, TipoItem tipo, int valor) {
     strcpy(p->item.nome, nome);
     p->item.tipo = tipo;
     p->item.valor = valor;
+}
+
+Inimigo inicializaInimigo(int nivel) {
+    Inimigo i;
+    i.vida = (int)ceil(40 * nivel);
+    i.ataque = (int)ceil(11 * nivel);
+    i.level = nivel;
+
+    return i;
 }
 
 void exibePropriedadesDoPlayer(Player *p) {
@@ -77,28 +86,29 @@ void luta(Player *p, Inimigo *i) {
     printf("\nInicio de batalha!\n");
     Sleep(1200);
     
-    printf("Voce deu de cara com um goblin level 2, de %d pontos de vida!\n", i->vida);
+    printf("Voce deu de cara com um goblin level %d, de %d pontos de vida!\n", i->level, i->vida);
 
     int rodadasComEscudoAtivo;
 
     while(p->vida > 0 && i->vida > 0) {
-        Sleep(1200);
-        printf("\n1. Atacar o inimigo?\n");
-        printf("2. Estabelecer defesa (Duracaoo de 3 rodadas)?\n");
-        printf("3. Utilizar item de cura?\n");
-
-        int escolha;
-        printf("\nComo voce vai prosseguir? (1, 2, 3)\n ");
-        scanf("%d", &escolha);
-
-        while (escolha < 1 || escolha > 3) {
-            printf("Opcao invalida! Digite um numero de 1 a 3.\n ");
-            scanf("%d", &escolha);
+        if (rodadasComEscudoAtivo > 0) {
+            Sleep(1200);
+            printf("Seu escudo ainda esta ativo por %d rodadas!\n", rodadasComEscudoAtivo);
         }
 
+        Sleep(1200);
+        int escolha;
+        do {
+            printf("\n1. Atacar\n2. Defender\n3. Usar Cura\nEscolha: ");
+            if (scanf("%d", &escolha) != 1) {
+                while (getchar() != '\n'); 
+                escolha = 0; 
+            }
+        } while (escolha < 1 || escolha > 3);
+
         if (escolha == 1) {
-            int danoPlayer = rand() % (p->ataque + 1);
-            if (danoPlayer == 0) {
+            int danoPlayer = (p->ataque - 5) + (rand() % 6);
+            if (danoPlayer < 1) {
                 Sleep(1200);
                 printf("\nVoce tentou atacar o inimigo mas ele desviou! Nenhum dano causado.\n");
             }
@@ -133,15 +143,12 @@ void luta(Player *p, Inimigo *i) {
             }
         }
 
-        int danoInimigo = rand() % (i->ataque + 1);
-
-        if (rodadasComEscudoAtivo > 0) {
-            //TODO
-            //lógica para diminuir o dano do inimigo de acordo com a defesa do player
-            //a defesa do player aumenta se ele estiver equipado com um item do tipo escudo
+        int danoInimigo = ((i->ataque - 5) + (rand() % 6)) - p->defesa;
+        if (p->item.tipo == Defesa && rodadasComEscudoAtivo > 0) {
+            danoInimigo -= p->item.valor;
         }
-
-        if (danoInimigo == 0) {
+        
+        if (danoInimigo < 1) {
             Sleep(1200);
             printf("O inimigo tentou te atacar mas voce desviou! Nenhum dano sofrido.\n");
         }
@@ -149,7 +156,7 @@ void luta(Player *p, Inimigo *i) {
             p->vida -= danoInimigo;
             if (p->vida < 0) p->vida = 0;
             Sleep(1200);
-            printf("O inimigo te atacou causando %d de dano! Sau vida: %d\n", danoInimigo, p->vida);
+            printf("O inimigo te atacou causando %d de dano! Sua vida: %d\n", danoInimigo, p->vida);
             if (p->vida <= 0) {
                 Sleep(1200);
                 printf("O jogador foi derrotado!\n");
@@ -164,7 +171,7 @@ void luta(Player *p, Inimigo *i) {
 
 int main()
 {
-    Player meuPlayer = inicializaPlayer(100, 20, 10, 3);
+    Player meuPlayer = inicializaPlayer(100, 20, 4, 3);
 
     for (int i = 0; i < 5; i++) {
         char nextLevel;
@@ -178,6 +185,7 @@ int main()
         Sleep(1200);
         exibePropriedadesDoPlayer(&meuPlayer);
 
+
         printf("\nPronto para a proxima etapa? (S/N)\n");
         fflush(stdin);
         scanf(" %c", &nextLevel);
@@ -187,7 +195,7 @@ int main()
             return 0;
         }
 
-        Inimigo meuInimigo = inicializaInimigo(40, 8);
+        Inimigo meuInimigo = inicializaInimigo(i + 1);
         luta(&meuPlayer, &meuInimigo);
     }
 
