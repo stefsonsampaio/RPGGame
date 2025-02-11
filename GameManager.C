@@ -108,6 +108,9 @@ void luta(Player *p, Inimigo *i) {
 
         if (escolha == 1) {
             int danoPlayer = (p->ataque - 5) + (rand() % 6);
+            if (p->item.tipo == Ataque) {
+                danoPlayer += p->item.valor;
+            }
             if (danoPlayer < 1) {
                 Sleep(1200);
                 printf("\nVoce tentou atacar o inimigo mas ele desviou! Nenhum dano causado.\n");
@@ -169,11 +172,43 @@ void luta(Player *p, Inimigo *i) {
     }
 }
 
+void explorar(Player *p, int rodada) {
+    printf("\nLevel de exploracao\n");
+}
+
 int main()
 {
+    //APRESENTAÇÃO DO JOGO
+    printf("**************************************\n");
+    printf("======================================\n");
+    printf("**************************************\n");
+    printf("\nBEM VINDO AO MEU JOGO RPG DE CONSOLE\n\n");
+    printf("**************************************\n");
+    printf("======================================\n");
+    printf("**************************************\n");
+
+    printf("\nExplicacoes iniciais:\n");
+    Sleep(1200);
+    printf("Seu objetivo e chegar ao final dos 20 niveis do jogo.\n");
+    printf("No primeiro nivel vc enfrentara seu primeiro inimigo.\nA partir dai, voce enfrentara um inimigo a cada 4 leveis.\nOs demais leveis sao de exploracao e historia.\n");
+    printf("O jogo permite multiplas decisoes, entrega diferentes possibiidades a cada vez que voce joga, e tem diferentes finais.\n");
+    printf("Ao morrer, voce tem um total de 3 segundas chances. Se perder todas, o seu jogo acaba e voce precisara reiniciar, entao, tome cuidado!\n");
+    printf("Durante as fases de exploracao, e possivel encontrar itens com raridades diferentes ou encontrar armadilhas. Entao, fique sempre atento.\n");
+    printf("Durante a batalha, voce tem as opcoes de SE CURAR, ATACAR, DEFENDER. Cada funcionalidade tem seu funcionamento.\n");
+    printf("Atacar voce apenas ataca.\nDefender voce aumenta a defesa do personagem durante 3 rodadas, mas isso so e valido se voce estiver equipado com um item do tipo ESCUDO.\nUsar cura voce usa uma de suas pocoes de cura e encerra a rodada.\n");
+    printf("Por ultimo, vale ressaltar que tanto voce quanto o inimigo tem um sistema de level e upgrade, e ambos ficam mais fortes de acordo com o level.\n");
+    printf("\nDito isso, valos comecar o jogo!\n");
+
+    char temp;
+    printf("\nPressione qualquer tecla para continuar...\n");
+    scanf("%c", temp);
+
     Player meuPlayer = inicializaPlayer(100, 20, 4, 3);
 
     for (int i = 0; i < 5; i++) {
+        printf("\nInicio da rodada %d!\n", i + 1);
+        Sleep(1200);
+
         char nextLevel;
 
         if (meuPlayer.vida <= 0) {
@@ -195,8 +230,13 @@ int main()
             return 0;
         }
 
-        Inimigo meuInimigo = inicializaInimigo(i + 1);
-        luta(&meuPlayer, &meuInimigo);
+        if (((i + 1) % 4 == 0) || i == 0) {
+            Inimigo meuInimigo = inicializaInimigo(i > 0 ? (i + 1) / 4 : 1);
+            luta(&meuPlayer, &meuInimigo);
+        }
+        else {
+            explorar(&meuPlayer, i + 1);
+        }
     }
 
     if (meuPlayer.vida > 0) {
