@@ -1,4 +1,5 @@
-//cd "c:\vs.code\RPGGame" && gcc GameManager.C -o GameManager && "C:\vs.code\RPGGame\"GameManager comando para executar script no CMD
+//comando para executar script no CMD
+//cd "c:\vs.code\RPGGame" && gcc GameManager.C -o GameManager && "C:\vs.code\RPGGame\"GameManager 
 
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +8,14 @@
 #include <ctype.h>
 #include <math.h>
 #include <windows.h>
+
+typedef enum {
+	VilaInicial,
+	Castelo,
+	Floresta,
+	Caverna,
+	CidadeDosGoblins
+} Ambiente;
 
 typedef enum {
     Nenhum = -1,
@@ -68,12 +77,14 @@ void exibePropriedadesDoPlayer(Player *p) {
     printf("\nSuas propriedades:\n");
     printf("- vida: %d\n", p->vida);
     printf("- quantidade de pocoes de cura: %d\n", p->quantidade_cura);
+	printf("- pontos de ataque: %d\n", p->ataque);
+	printf("- pontos de defesa: %d\n", p->defesa);
     if (strlen(p->item.nome) > 0) {
         printf("- Equipamento: %c\n", p->item.nome);
-        if (p->item.tipo == 1) {
+        if (p->item.tipo == Ataque) {
             printf("- Dano do equipamento: %d\n", p->item.valor);
         }
-        else {
+        else if (p->item.tipo == Defesa) {
             printf("- Defesa do equipamento: %d\n", p->item.valor);
         }
     }
@@ -172,8 +183,69 @@ void luta(Player *p, Inimigo *i) {
     }
 }
 
+Ambiente obterAmbiente(int nivel) {
+	if (nivel <= 3) return VilaInicial;
+	else if (nivel <= 7) return Castelo;
+    else if (nivel <= 11) return Floresta;
+    else if (nivel <= 15) return Caverna;
+    else return CidadeDosGoblins;
+}
+
 void explorar(Player *p, int rodada) {
-    printf("\nLevel de exploracao\n");
+    Ambiente ambiente = obterAmbiente(rodada);
+    int opcao;
+
+    printf("\n=== Exploração no ambiente: \n");
+	
+	Sleep(1200);
+	
+	switch (ambiente) {
+		case VilaInicial:
+			printf("1 - Conversar com os aldeões\n");
+            printf("2 - Procurar um item no mercado\n");
+            printf("3 - Descansar na pousada (+vida)\n");
+            break;
+        case Castelo:
+            printf("1 - Investigar a biblioteca real\n");
+            printf("2 - Explorar as catacumbas do castelo\n");
+            printf("3 - Conversar com os guardas\n");
+            break;
+        case Floresta:
+            printf("1 - Procurar ervas medicinais (+vida)\n");
+            printf("2 - Caçar uma criatura\n");
+            printf("3 - Encontrar um esconderijo\n");
+            break;
+        case Caverna:
+            printf("1 - Procurar um tesouro escondido\n");
+            printf("2 - Encontrar uma saída alternativa\n");
+            printf("3 - Se esconder de criaturas sombrias\n");
+            break;
+        case CidadeDosGoblins:
+            printf("1 - Espionar os goblins\n");
+            printf("2 - Roubar suprimentos\n");
+            printf("3 - Desafiar um goblin para um duelo\n");
+            break;
+	}
+	
+	printf("\nEscolha sua ação: ");
+    scanf("%d", &opcao);
+	
+	switch (opcao) {
+        case 1:
+            printf("Você toma uma decisão interessante...\n");
+            Sleep(1200);
+            break;
+        case 2:
+            printf("Algo inesperado acontece...\n");
+            Sleep(1200);
+            break;
+        case 3:
+            printf("Você se prepara para os desafios futuros...\n");
+            Sleep(1200);
+            break;
+        default:
+            printf("Escolha inválida! Você hesita e perde tempo...\n");
+    }
 }
 
 int main()
