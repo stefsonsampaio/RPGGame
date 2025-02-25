@@ -19,6 +19,18 @@ typedef enum {
 	CidadeDosGoblins
 } Ambiente;
 
+const char* ambienteParaString(Ambiente ambiente) {
+	const char* nomes[] = {
+		"Vila inicial",
+		"Castelo",
+		"Floresta",
+		"Caverna",
+		"Cidade dos Globlins"
+	};
+	
+	return nomes[ambiente];
+}
+
 //enum utilizado para definicao de tipo de item equipado pelo player
 typedef enum {
     Nenhum = -1,
@@ -73,7 +85,7 @@ Player inicializaPlayer(int vida, int ataque, int defesa, int quantidade_cura) {
 void equiparItem(Player *p, const char *nome, TipoItem tipo, int valor) {
     int slot = -1;
     
-    // Verifica se o item já está equipado e se há um slot livre
+    // Verifica se o item ja esta equipado e se ha um slot livre
     for (int i = 0; i < 2; i++) {
         if (p->itens[i].tipo == tipo && tipo == Defesa) {
             // Não pode equipar dois escudos
@@ -100,7 +112,7 @@ void equiparItem(Player *p, const char *nome, TipoItem tipo, int valor) {
 //funcao para inicializar inimigo1
 Inimigo inicializaInimigo(int nivel) {
     Inimigo i;
-    i.vida = (int)ceil(40 * nivel);
+    i.vida = (int)ceil(30 * nivel);
     i.ataque = (int)ceil(11 * nivel);
     i.level = nivel;
 
@@ -184,12 +196,15 @@ void luta(Player *p, Inimigo *i) {
                 printf("Voce nao tem mais curas! Sua rodada foi desperdicada.\n");
             }
         }
+		
+		Sleep(1200);
+		
         int danoInimigo = ((i->ataque - 5) + (rand() % 6)) - p->defesa;
         for (int j = 0; j < 2; j++) {
             if (p->itens[j].tipo == Defesa) {
                 danoInimigo -= p->itens[j].valor; //se equipado com escudo, a defesa é reforçada
                 if (rodadasComEscudoAtivo > 0) {
-                    danoInimigo -= p->itens[j].valor; //Se está com escudo ativo na rodada, a defesa fica reforçada 2x
+                    danoInimigo -= p->itens[j].valor; //Se esta com escudo ativo na rodada, a defesa fica reforçada 2x
                 }
             }
         }
@@ -236,7 +251,7 @@ Ambiente obterAmbiente(int nivel) {
 }
 
 void descricaoAmbiente(Ambiente ambiente, int rodada) {
-    printf("\n--- Explorando o ambiente ---\n");
+    printf("\n--- Explorando o ambiente: %s ---\n", ambienteParaString(ambiente));
     Sleep(1200);
 
     switch (ambiente) {
@@ -400,6 +415,8 @@ void descricaoAmbiente(Ambiente ambiente, int rodada) {
 
 
 void eventoAleatorio(Player *p) {
+	srand(time(NULL)); //para rotar o random realmente aleatório
+	
     int chance = rand() % 100;
     if (chance < 55) {
         int itemChance = rand() % 100;
@@ -433,7 +450,7 @@ void eventoAleatorio(Player *p) {
         scanf(" %c", &escolha);
         if (toupper(escolha) == 'S') {
             equiparItem(p, itemNome, tipoNovoItem, valor);
-            printf("Item equipado!\n");
+            //printf("Item equipado!\n");
         } else {
             printf("Voce escolheu nao equipar o item!\n");
         }
@@ -451,6 +468,8 @@ void eventoAleatorio(Player *p) {
 
 // Funcao para explorar o ambiente
 void explorar(Player *p, int rodada) {
+	srand(time(NULL)); //para rotar o random realmente aleatório
+	
     Ambiente ambiente = obterAmbiente(rodada);
     int opcao;
 
@@ -482,11 +501,11 @@ void explorar(Player *p, int rodada) {
                 p->defesa += 1;
             }
             else if (ambiente == Castelo) {
-                printf("Uma armadura enferrujada, mas ainda pode ser util como protecao!\n");
+                printf("Uma armadura enferrujada, mas ainda pode ser util como protecao! Sua defesa aumentou!\n");
                 p->defesa += 1;
             }
             else if (ambiente == Floresta) {
-                printf("Uma fonte mágica! Voce sente sua vida sendo restaurada!\n");
+                printf("Uma fonte magica! Voce sente sua vida sendo restaurada!\n");
                 p->vida += 10;
             }
             else if (ambiente == Caverna) {
@@ -510,7 +529,7 @@ void explorar(Player *p, int rodada) {
             break;
 
         default:
-            printf("\nEscolha inválida! Voce hesita e perde tempo...\n");
+            printf("\nEscolha invalida! Voce hesita e perde tempo...\n");
     }
 }
 
@@ -538,10 +557,12 @@ int main()
     printf("Por ultimo, vale ressaltar que tanto voce quanto o inimigo tem um sistema de level e upgrade, e ambos ficam mais fortes de acordo com o level.\n");
     printf("\nDito isso, valos comecar o jogo!\n");
 
-	//variável usada somente para dar uma pausa antes de iniciar de fato o jogo
+	//variavel usada somente para dar uma pausa antes de iniciar de fato o jogo
     char temp;
     printf("\nPressione qualquer tecla para continuar...\n");
     scanf(" %c", &temp);
+	
+	Sleep(1200);
 
     printf("\nVoce e um simples ferreiro morador da uma vila proxima ao castelo onde fica a familia real.\n");
     printf("Sua vida sempre foi muito pacata, mas voce nao e como as pessoas dali.\n");
@@ -553,7 +574,7 @@ int main()
     printf("Voce nao pensa duas vezes. Essa e sua chance para ser o heroi de todos.\n");    
     printf("E aqui que sua historia comeca. Voce pega suas coisas e sai de casa para descobrir onde esta a princesa e traze-la de volta.\n");
 
-    //variável usada somente para dar uma pausa antes de iniciar de fato o jogo
+    //variavel usada somente para dar uma pausa antes de iniciar de fato o jogo
     printf("\nPressione qualquer tecla para continuar...\n");
     scanf(" %c", &temp);
 
@@ -589,7 +610,7 @@ int main()
 
         if (((i + 1) % 5 == 0) || i == 0) {
             if (i==0) {
-                printf("\nVoce mal saiu de casa e ja deu de cara com seu primeiro inimmigo! Prepare-se, sua aventura comecou mais cedo do que voce esperava!\n");
+                printf("\nVoce sai de casa e ja da de cara com seu primeiro inimmigo! Prepare-se, sua aventura comecou mais cedo do que voce esperava!\n");
             }
             if (i==1){
                 printf("\n===Voce esta na vila!===\n");
