@@ -10,6 +10,18 @@
 #include <math.h>
 #include <windows.h>
 
+//variáveis booleanas que influenciarão nos finais alterantivos
+/*
+- final bom:                                                        conversouComGoblins = true, chegouAoFinal = true
+- final ruim, vc precisou se sacrificar pela princesa:              acompanhouPrincesa = true
+- final ruim, vc chegou ao fim mas a princesa foi perdida:          princesaEscondida = true
+- final incopmpleto:                                                VOCE MORREU ANTES DE CHEGAR AO FINAL
+*/
+bool princesaEscodinda = false, 
+    conversouComGoblins = false, 
+    acompanhouPrincesa = false,
+    chegouAoFinal = false;
+
 //enum utilizado para cada capitulo do jogo
 typedef enum {
 	VilaInicial,
@@ -375,42 +387,56 @@ void descricaoAmbiente(Ambiente ambiente, int rodada) {
             }
             break;
 
-        case CidadeDosGoblins:
-            switch (rodada) {
-                case 21:
-                    printf("A cidade goblin eh uma bagunca caotica. Criaturas pequenas negociam objetos duvidosos.\n");
-                    Sleep(1200);
-                    printf("Voce escuta goblins cochichando sobre uma prisioneira humana... a princesa!\n");
-                    Sleep(1200);
-                    break;
-                case 22:
-                    printf("O cheiro de metal derretido preenche o ar. Goblins forjam armas em chamas alaranjadas.\n");
-                    Sleep(1200);
-                    printf("Um goblin encapuzado te encara de um beco escuro. 'Talvez eu tenha informacoes... por um preco'.\n");
-                    Sleep(1200);
-                    break;
-                case 23:
-                    printf("Voce encontrou a princesa! Agora precisa fugir antes que o alarme soe.\n");
-                    Sleep(1200);
-                    printf("Mas sera que fugir sera o bastante? Ou o rei goblin ira persegui-los ate o fim do mundo?\n");
-                    Sleep(1200);
-                    break;
-                case 24:
-                    printf("O rei goblin aguarda em seu trono. Este eh o momento decisivo.\n");
-                    Sleep(1200);
-                    printf("O castelo goblin treme com os gritos dos servos. Apenas um de voces saira vivo desta batalha.\n");
-                    Sleep(1200);
-                    break;
-            }
-            break;
-
         default:
-            printf("Voce esta em um lugar desconhecido... Algo nao parece certo aqui.\n");
+            printf("\n");
             Sleep(1200);
             break;
     }
 
     printf("\nO que deseja fazer?\n");
+}
+
+//DEDICADO AO AMBIENTE FINAL
+void descricaoAmbienteFinal(Ambiente ambiente, int rodada) {
+    printf("\n--- Explorando o ambiente: %s ---\n", ambienteParaString(ambiente));
+    Sleep(1200);
+
+    switch (ambiente) {
+        case CidadeDosGoblins:
+                switch (rodada) {
+                    case 21:
+                        printf("Essa cidade e um caos. Todos sao assustados e deconfiados. Voce claramente nao e bem-vindo\n");
+                        Sleep(1200);
+                        printf("Todos falam de voce por onde voce fala. Voce consegue escutar os cochichos de alguns deles.\n");
+                        Sleep(1200);
+                        printf("'Ele nao vai sair daqui sem deixar algo em troca. Se a princesa fora, ALGUEM tera que fica.'\n");
+                        Sleep(1200);
+                        break;
+                    case 22:
+                        printf("O cheiro de metal derretido preenche o ar. Goblins forjam armas em chamas alaranjadas.\n");
+                        Sleep(1200);
+                        printf("Um goblin encapuzado te encara de um beco escuro. 'Talvez eu tenha informacoes... por um preco'.\n");
+                        Sleep(1200);
+                        break;
+                    case 23:
+                        printf("Voce encontrou a princesa! Agora precisa fugir antes que o alarme soe.\n");
+                        Sleep(1200);
+                        printf("Mas sera que fugir sera o bastante? Ou o rei goblin ira persegui-los ate o fim do mundo?\n");
+                        Sleep(1200);
+                        break;
+                    case 24:
+                        printf("O rei goblin aguarda em seu trono. Este eh o momento decisivo.\n");
+                        Sleep(1200);
+                        printf("O castelo goblin treme com os gritos dos servos. Apenas um de voces saira vivo desta batalha.\n");
+                        Sleep(1200);
+                        break;
+                }
+            break;
+        default:
+            printf("\n");
+            Sleep(1200);
+        break;
+    }
 }
 
 
@@ -463,6 +489,11 @@ void eventoAleatorio(Player *p) {
         luta(p, &meuInimigo);
     }
     Sleep(1200);
+}
+
+//DEDICADO AO AMBIENTE FINAL
+void eventoAleatorioAmbienteFinal(Player *p) {
+
 }
 
 
@@ -533,6 +564,51 @@ void explorar(Player *p, int rodada) {
     }
 }
 
+//DEDICADO AO AMBIENTE FINAL
+void explorarAmbienteFinal(Player *p, int rodada) {
+    srand(time(NULL)); //para rotar o random realmente aleatório
+
+    Ambiente ambiente = obterAmbiente(rodada);
+    int opcao;
+
+    //introdução ao level final
+    printf("\n=== Voce chegou ao level final! ===\n");
+    Sleep(1200);
+
+    printf("A partir daqui, voce tera opcoes diferentes de interacao.\n");
+    printf("Fique atendo! Suas decisoes definirao qual final voce tera no jogo!\n");
+    Sleep(1200);
+
+    descricaoAmbienteFinal(ambiente, rodada);
+
+    printf("1 - Explorar o local\n");
+    printf("2 - Interagir com um objeto\n");
+    printf("3 - Descansar e recuperar energia (+vida)\n");
+
+    printf("\nEscolha sua acao: ");
+    scanf("%d", &opcao);
+
+    switch (opcao) { //TODO
+        case 1:
+            printf("");
+            Sleep(1200);
+            eventoAleatorioAmbienteFinal(p); // Chama o evento aleatorio
+            break;
+
+        case 2:
+            printf("");
+            Sleep(1200);
+            break;
+        case 3:
+            printf("");
+            Sleep(1200);
+            break;
+
+        default:
+            printf("\n");
+    }
+}
+
 int main()
 {
     //APRESENTAcaO DO JOGO
@@ -547,14 +623,13 @@ int main()
     printf("\nExplicacoes iniciais:\n");
     Sleep(1200);
     printf("Seu objetivo e chegar ao final dos 20 niveis do jogo.\n");
-    printf("No primeiro nivel vc enfrentara seu primeiro inimigo.\nA partir dai, voce enfrentara um inimigo a cada 5 leveis.\nOs demais leveis sao de exploracao e historia.\n");
+    printf("Voce enfrentara um inimigo a cada 5 leveis.\nOs demais leveis sao de exploracao e historia.\n");
     printf("Nos leveis de exploracao, voce conseguira escolher como prosseguir em cada etapa, conforme sera exibido na tela.\n");
-    printf("O jogo permite multiplas decisoes, entrega diferentes possibiidades a cada vez que voce joga, e tem diferentes finais.\n");
+    printf("O jogo tem multiplos finais. O final será decidido com suas decisões no ambiente da Cidade Dos Goblins.\n");
     printf("Ao morrer, voce tem um total de 3 segundas chances. Se perder todas, o seu jogo acaba e voce precisara reiniciar, entao, tome cuidado!\n");
-    printf("Durante as fases de exploracao, e possivel encontrar itens com raridades diferentes ou encontrar armadilhas. Entao, fique sempre atento.\n");
     printf("Durante a batalha, voce tem as opcoes de SE CURAR, ATACAR, DEFENDER. Cada funcionalidade tem seu funcionamento.\n");
     printf("Atacar voce apenas ataca.\nDefender voce aumenta a defesa do personagem durante 3 rodadas, mas isso so e valido se voce estiver equipado com um item do tipo ESCUDO.\nUsar cura voce usa uma de suas pocoes de cura e encerra a rodada.\n");
-    printf("Por ultimo, vale ressaltar que tanto voce quanto o inimigo tem um sistema de level e upgrade, e ambos ficam mais fortes de acordo com o level.\n");
+    printf("A cada level de luta, o inimigo será mais forte.\n");
     printf("\nDito isso, valos comecar o jogo!\n");
 
 	//variavel usada somente para dar uma pausa antes de iniciar de fato o jogo
@@ -609,31 +684,17 @@ int main()
         }
 
         if (((i + 1) % 5 == 0) || i == 0) {
-            if (i==0) {
-                printf("\nVoce sai de casa e ja da de cara com seu primeiro inimmigo! Prepare-se, sua aventura comecou mais cedo do que voce esperava!\n");
-            }
-            if (i==1){
-                printf("\n===Voce esta na vila!===\n");
-            }
-            if (i==6){
-                printf("\n===Voce chegou ao Castelo!===\n");
-            }
-            if (i==11){
-                printf("\n===Voce chegou a Floresta Amaldiçoada!===\n");
-            }
-            if (i==16){
-                printf("\n===Voce chegou a Caverna!===\n");
-            }
-            if (i==21){
-                printf("\n===Voce chegou a tao temida Cidade Dos Goblins!===\n===Bem-vindo ao level final!===\n");
-            }
-
 			//o inimigo e inicializado a cada 4 rodadas e suas propriedades aumentam de acordo com o level atual
             Inimigo meuInimigo = inicializaInimigo(i > 0 ? (i + 1) / 5 : 1);
             luta(&meuPlayer, &meuInimigo);
         }
         else {
-            explorar(&meuPlayer, i);
+            if (i < 20) {
+                explorar(&meuPlayer, i);
+            }
+            else {
+                explorarAmbienteFinal(&meuPlayer, i);
+            }
         }
     }
 
