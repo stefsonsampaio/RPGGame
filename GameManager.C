@@ -13,13 +13,13 @@
 //variáveis booleanas que influenciarão nos finais alterantivos
 /*
 - final bom:                                                        conversouComGoblins = true, chegouAoFinal = true
-- final ruim, vc precisou se sacrificar pela princesa:              acompanhouPrincesa = true
+- final ruim, vc precisou se sacrificar pela princesa:              acompanhouPrincesa = false
 - final ruim, vc chegou ao fim mas a princesa foi perdida:          princesaEscondida = true
 - final incopmpleto:                                                VOCE MORREU ANTES DE CHEGAR AO FINAL
 */
 bool princesaEscodinda = false, 
     conversouComGoblins = false, 
-    acompanhouPrincesa = false,
+    acompanhouPrincesa = true,
     chegouAoFinal = false;
 
 //enum utilizado para cada capitulo do jogo
@@ -244,6 +244,7 @@ void luta(Player *p, Inimigo *i) {
                 }
                 else {
                     printf("Voce foi derrotado!\n");
+                    printf("Esse e o pior final possivel. A princesa continua em perigo e voce nunca se tornou um heroi.\n");
                 }
             }
         }
@@ -401,44 +402,94 @@ void descricaoAmbienteFinal(Ambiente ambiente, int rodada) {
     printf("\n--- Explorando o ambiente: %s ---\n", ambienteParaString(ambiente));
     Sleep(1200);
 
-    switch (ambiente) {
-        case CidadeDosGoblins:
-                switch (rodada) {
-                    case 21:
-                        printf("Essa cidade e um caos. Todos sao assustados e deconfiados. Voce claramente nao e bem-vindo\n");
-                        Sleep(1200);
-                        printf("Todos falam de voce por onde voce fala. Voce consegue escutar os cochichos de alguns deles.\n");
-                        Sleep(1200);
-                        printf("'Ele nao vai sair daqui sem deixar algo em troca. Se a princesa fora, ALGUEM tera que fica.'\n");
-                        Sleep(1200);
-                        break;
-                    case 22:
-                        printf("O cheiro de metal derretido preenche o ar. Goblins forjam armas em chamas alaranjadas.\n");
-                        Sleep(1200);
-                        printf("Um goblin encapuzado te encara de um beco escuro. 'Talvez eu tenha informacoes... por um preco'.\n");
-                        Sleep(1200);
-                        break;
-                    case 23:
-                        printf("Voce encontrou a princesa! Agora precisa fugir antes que o alarme soe.\n");
-                        Sleep(1200);
-                        printf("Mas sera que fugir sera o bastante? Ou o rei goblin ira persegui-los ate o fim do mundo?\n");
-                        Sleep(1200);
-                        break;
-                    case 24:
-                        printf("O rei goblin aguarda em seu trono. Este eh o momento decisivo.\n");
-                        Sleep(1200);
-                        printf("O castelo goblin treme com os gritos dos servos. Apenas um de voces saira vivo desta batalha.\n");
-                        Sleep(1200);
-                        break;
-                }
-            break;
-        default:
-            printf("\n");
-            Sleep(1200);
-        break;
-    }
+	switch (rodada) {
+		case 21:
+			printf("Essa cidade e um caos. Todos sao assustados e deconfiados. Voce claramente nao e bem-vindo\n");
+			Sleep(1200);
+			printf("Todos falam de voce por onde voce fala. Voce consegue escutar os cochichos de alguns deles.\n");
+			Sleep(1200);
+			printf("'Ele nao vai sair daqui sem deixar algo em troca. Se a princesa fora, ALGUEM tera que fica.'\n");
+			Sleep(1200);
+			printf("Parece ser cada vez mais perigoso para a princesa te acompanhar nessa jornada\n");
+			Sleep(1200);
+			break;
+		case 22:
+			printf("O cheiro de metal derretido preenche o ar. Goblins forjam armas em chamas alaranjadas.\n");
+			Sleep(1200);
+			printf("Um goblin encapuzado te encara de um beco escuro. 'Talvez eu tenha informacoes... por um preco'.\n");
+			Sleep(1200);
+			printf("'Sera seguro converser com essa gblin?', voce pensa. Talvez as informacoes dele sejam importantes.\n");
+			Sleep(1220);
+			break;
+		case 23:
+			printf("A princesa parece cansada. Ela esta desaparecida a muito tempo. Nao sei se ela vai aguentar continuar me seguindo.\n");
+			Sleep(1200);
+			printf("Mas sera que fugir sera o bastante? Ou o rei goblin ira persegui-los ate o fim do mundo?\n");
+			Sleep(1200);
+			printf("Quanto mais tempo voce fica aqui, mais o goblins repetem que voce nao saira sem enfrentar o Rei Goblin.\n");
+			Sleep(1200);
+			break;
+		case 24:
+			printf("O ambiente esta cada vez mais tenso. Voce sente nas suas visceras que esta chegando no covil do Rei...\n");
+			Sleep(1200);
+			printf("O rei goblin aguarda em seu trono. Este e o momento decisivo.\n");
+			Sleep(1200);
+			printf("O castelo goblin treme com os gritos dos servos. Apenas um de voces saira vivo desta batalha.\n");
+			Sleep(1200);
+			printf("Sera bom ter escondido a princesa? Ou ter ido sozinha e disfarcada seria realmente a melhor escolha?");
+			Sleep(1200);
+			break;
+	}
 }
 
+//DEDICADO AO AMBIENTE FINAL
+void eventoAleatorioAmbienteFinal(Player *p) {
+    srand(time(NULL)); //para rotar o random realmente aleatório
+
+    int chance = rand() % 100;
+
+    if (chance < 55) {
+        int itemChance = rand() % 100;
+        TipoItem tipoNovoItem;
+        const char *itemNome;
+        int valor = 0;
+        if (itemChance <= 10) {
+            itemNome = "Espada Rara feita por goblins (+50 de dano)";
+            tipoNovoItem = Ataque;
+            valor = 50;
+        } else if (itemChance <= 20) {
+            itemNome = "Escudo Raro feito por goblins (+50 de defesa)";
+            tipoNovoItem = Defesa;
+            valor = 50;
+        } else if (itemChance <= 65) {
+            itemNome = "Espada Comum feita por goblins (+25 de dano)";
+            tipoNovoItem = Ataque;
+            valor = 25;
+        } else {
+            itemNome = "Escudo Comum feito por goblins (+25 de defesa)";
+            tipoNovoItem = Defesa;
+            valor = 25;
+        }
+        printf("\nVoce encontrou um(a) %s!\n", itemNome);
+        printf("Deseja equipar o novo item? (S/N)\n");
+        char escolha;
+        scanf(" %c", &escolha);
+        if (toupper(escolha) == 'S') {
+            equiparItem(p, itemNome, tipoNovoItem, valor);
+            //printf("Item equipado!\n");
+        } else {
+            printf("Voce escolheu nao equipar o item!\n");
+        }
+    } else if (chance < 95) {
+        p->quantidade_cura += 3;
+        printf("\nVoce encontrou tres pocoes de cura! Agora tem %d itens de cura.\n", p->quantidade_cura);
+    } else {
+        printf("\nVoce foi emboscado por um inimigo poderoso!\n");
+        Inimigo meuInimigo = inicializaInimigo(3);
+        luta(p, &meuInimigo);
+    }
+    Sleep(1200);
+}
 
 void eventoAleatorio(Player *p) {
 	srand(time(NULL)); //para rotar o random realmente aleatório
@@ -449,18 +500,14 @@ void eventoAleatorio(Player *p) {
         TipoItem tipoNovoItem;
         const char *itemNome;
         int valor = 0;
-        if (itemChance <= 5) {
+        if (itemChance <= 10) {
             itemNome = "Espada Rara (+25 de dano)";
             tipoNovoItem = Ataque;
             valor = 25;
-        } else if (itemChance <= 10) {
+        } else if (itemChance <= 20) {
             itemNome = "Escudo Raro (+25 de defesa)";
             tipoNovoItem = Defesa;
             valor = 25;
-        } else if (itemChance <= 30) {
-            p->quantidade_cura++;
-            printf("\nVoce encontrou um pote de cura! Agora tem %d itens de cura.\n", p->quantidade_cura);
-            return;
         } else if (itemChance <= 65) {
             itemNome = "Espada Comum (+10 de dano)";
             tipoNovoItem = Ataque;
@@ -490,12 +537,6 @@ void eventoAleatorio(Player *p) {
     }
     Sleep(1200);
 }
-
-//DEDICADO AO AMBIENTE FINAL
-void eventoAleatorioAmbienteFinal(Player *p) {
-
-}
-
 
 // Funcao para explorar o ambiente
 void explorar(Player *p, int rodada) {
@@ -575,32 +616,43 @@ void explorarAmbienteFinal(Player *p, int rodada) {
     printf("\n=== Voce chegou ao level final! ===\n");
     Sleep(1200);
 
-    printf("A partir daqui, voce tera opcoes diferentes de interacao.\n");
-    printf("Fique atendo! Suas decisoes definirao qual final voce tera no jogo!\n");
-    Sleep(1200);
+	if (rodada == 21) {		
+		printf("A partir daqui, voce tera opcoes diferentes de interacao.\n");
+		printf("Fique atendo! Suas decisoes definirao qual final voce tera no jogo!\n");
+		Sleep(1200);
+	}
 
     descricaoAmbienteFinal(ambiente, rodada);
 
-    printf("1 - Explorar o local\n");
-    printf("2 - Interagir com um objeto\n");
-    printf("3 - Descansar e recuperar energia (+vida)\n");
+	printf("\n");
+    if (princesaEscodinda == false && acompanhouPrincesa == true && conversouComGoblins == false) {printf("1 - Esconder a princesa num lugar seguro.\n");}    
+    if (acompanhouPrincesa == true && princesaEscodinda == false && conversouComGoblins == false) {printf("2 - Disfarcar a princesa e mandar ela ir embora sem voce.\n");}
+    printf("3 - Procurar itens no cenario\n");
+    if (conversouComGoblins == false && princesaEscodinda == false && acompanhouPrincesa == true) {printf("4 - Conversar com os goblins que estao proximos.\n");}
 
     printf("\nEscolha sua acao: ");
     scanf("%d", &opcao);
 
     switch (opcao) { //TODO
         case 1:
-            printf("");
+            printf("Voce procura um lugar escondido para a princesa ficar e promete voltar assim que encontrar uma saida.\n");
+            princesaEscodinda = true;
             Sleep(1200);
-            eventoAleatorioAmbienteFinal(p); // Chama o evento aleatorio
             break;
 
         case 2:
-            printf("");
+            printf("Voce entrega um sobretudo a princesa e agora ela esta irreconhecicel. Parece segura manda-la na frente.\n");
+            acompanhouPrincesa = false;
             Sleep(1200);
             break;
         case 3:
-            printf("");
+            printf("voce decide vasculhar o local. Talvez acabe encontrando um item descartado pelos goblins.\n");
+            eventoAleatorioAmbienteFinal(p);
+            Sleep(1200);
+            break;
+        case 4:
+            printf("Depois de uma conversa com os goblins, eles passam a te considerar corajoso e o deixarao ir embora se voce derrotar o Rei Goblin.\n");
+            conversouComGoblins = true;
             Sleep(1200);
             break;
 
@@ -657,7 +709,7 @@ int main()
     Player meuPlayer = inicializaPlayer(100, 20, 4, 3);
 
 	//loop inicial do game. O jogo tem 25 rodadas
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 25; i++) {
         printf("\nInicio da rodada %d!\n", i + 1);
         Sleep(1200);
 
@@ -700,8 +752,31 @@ int main()
 
 	//Se chegar ao fim do jogo vivo, significa que venceu o jogo
     if (meuPlayer.vida > 0) {
+        printf("\nParabens! Voce chegou com vida ate o fim da aventura!\n");
+        chegouAoFinal = true;
         Sleep(1200);
-        printf("\nParabens! Voce venceu o jogo!\n");
+    }
+
+    if (conversouComGoblins = true && chegouAoFinal == true && acompanhouPrincesa == true) {
+        printf("\n===VOCE CONSEGUIU O FINAL BOM===\n");
+        Sleep(1200);
+        printf("Parabens! Voce tomou todas as melhores decisoes.\n");
+        printf("Conversar com os golbins te possibilitou sair de la com vida.\nManter a princesa ao seu lado foi a melhor decisao. Os goblins teriam encontrado ela.\n");
+        printf("Ao voltar pra vila, voce e visto como heroi. Passa a ser o fiel escudeiro da realiza, reconhecido por todo o pais!\n");
+    }
+    else if (acompanhouPrincesa == false) {
+        printf("\n===VOCE CONSEGUIU O FINAL RUIM===\n"); 
+        Sleep(1200);
+        printf("Deixaa princesa ir sozinha nao foi uma escolha boa. Os goblins encontraram ela no caminho e ela nunca mais foi vista.\n");
+        printf("Voce volta para a vila, mas nada mudou, a cidade continua em desespero sem sua querida princesa.\n");
+        printf("Tente novamente.\n");
+    }
+    else if (princesaEscodinda == true) {
+        printf("\n===VOCE CONSEGUIU O FINAL RUIM===\n");
+        Sleep(1200);
+        printf("Esconder a princesa parecia uma boa opcao, mas os goblins a encontraram pouco tempo depois. A princesa nunca mais foi vista.\n");
+        printf("Voce volta para a vila, mas nada mudou, a cidade continua em desespero sem sua querida princesa.\n");
+        printf("Tente novamente.\n");
     }
 
 
